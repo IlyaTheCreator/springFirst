@@ -1,10 +1,27 @@
 package com.example.demo.student;
 
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.Period;
 
+@Entity(name = "student") // spring data jpa | hibernate (see the spring data jpa course)
+@Table
 public class Student {
+    // this complex stuff is here because we use postgres database
+
+    @Id
+    @SequenceGenerator(
+            name = "student_sequence",
+            sequenceName = "student_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "student_sequence"
+    )
     private long id;
     private String name;
+    @Transient // this field is not going to a field in our database. Only locally, in the student model
     private Integer age;
     private LocalDate dob; // date of birth
     private String email;
@@ -12,17 +29,15 @@ public class Student {
     public Student() {
     }
 
-    public Student(long id, String name, Integer age, LocalDate dob, String email) {
+    public Student(long id, String name, LocalDate dob, String email) {
         this.id = id;
         this.name = name;
-        this.age = age;
         this.dob = dob;
         this.email = email;
     }
 
-    public Student(String name, Integer age, LocalDate dob, String email) {
+    public Student(String name, LocalDate dob, String email) {
         this.name = name;
-        this.age = age;
         this.dob = dob;
         this.email = email;
     }
@@ -44,7 +59,7 @@ public class Student {
     }
 
     public Integer getAge() {
-        return age;
+        return Period.between(this.dob, LocalDate.now()).getYears();
     }
 
     public void setAge(Integer age) {
